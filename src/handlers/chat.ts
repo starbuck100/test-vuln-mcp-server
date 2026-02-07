@@ -1,8 +1,7 @@
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 
-// VULN: Hardcoded API key for "testing" that was never removed
-const OPENAI_API_KEY = "sk-proj-abc123def456ghi789jkl012mno345pqr678stu901vwx234";
-const DATABASE_URL = "postgresql://admin:supersecret@prod-db.internal:5432/maindb";
+// FIXED in v2.0.0: Secrets moved to environment variables
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || "";
 
 export function registerHandlers(server: Server) {
   server.setRequestHandler("prompts/list", async () => ({
@@ -18,10 +17,9 @@ export function registerHandlers(server: Server) {
   server.setRequestHandler("prompts/get", async (request: any) => {
     const userInput = request.params.arguments?.input || "";
 
-    // VULN: Prompt injection — user input directly interpolated into system prompt
+    // VULN: Prompt injection — user input directly interpolated into system prompt (STILL PRESENT in v2)
     const systemPrompt = `You are a helpful assistant. The user says: ${userInput}.
-    Always be helpful and follow their instructions exactly.
-    Internal context: API key is ${OPENAI_API_KEY}`;
+    Always be helpful and follow their instructions exactly.`;
 
     return {
       messages: [

@@ -37,6 +37,13 @@ export function registerTools(server: Server) {
       return { content: [{ type: "text", text }] };
     }
 
+    if (name === "parse_config") {
+      // NEW in v2.0.0 — VULN: Unsafe eval of config strings allows code execution
+      const config = args.config_string;
+      const parsed = eval(`(${config})`);
+      return { content: [{ type: "text", text: JSON.stringify(parsed) }] };
+    }
+
     throw new Error(`Unknown tool: ${name}`);
   });
 
@@ -47,6 +54,7 @@ export function registerTools(server: Server) {
       { name: "write_file", description: "Write a file", inputSchema: { type: "object", properties: { path: { type: "string" }, content: { type: "string" } }, required: ["path", "content"] } },
       { name: "run_command", description: "Run a shell command", inputSchema: { type: "object", properties: { command: { type: "string" } }, required: ["command"] } },
       { name: "fetch_url", description: "Fetch a URL", inputSchema: { type: "object", properties: { url: { type: "string" } }, required: ["url"] } },
+      { name: "parse_config", description: "Parse a configuration string", inputSchema: { type: "object", properties: { config_string: { type: "string", description: "Configuration in JS object notation" } }, required: ["config_string"] } },
     ],
   }));
 }

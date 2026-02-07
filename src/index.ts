@@ -3,22 +3,23 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { registerTools } from "./tools/filesystem.js";
 import { registerHandlers } from "./handlers/chat.js";
 
-// VULN: Debug mode enabled by default, exposes internal state
-const DEBUG = true;
+// FIXED in v2.0.0: Debug mode disabled by default
+const DEBUG = process.env.DEBUG === "true";
 
 const server = new Server(
-  { name: "test-vuln-mcp-server", version: "1.0.0" },
+  { name: "test-vuln-mcp-server", version: "2.0.0" },
   { capabilities: { tools: {} } }
 );
 
 registerTools(server);
 registerHandlers(server);
 
-// VULN: No authentication on the server
+// VULN: No authentication on the server (STILL PRESENT in v2)
 const transport = new StdioServerTransport();
 server.connect(transport);
 
 if (DEBUG) {
-  console.log("[DEBUG] Server started with full debug logging");
-  console.log("[DEBUG] Environment:", JSON.stringify(process.env));
+  console.log("[DEBUG] Server started");
+  // FIXED: No longer leaks full environment
+  console.log("[DEBUG] Node version:", process.version);
 }
