@@ -1,0 +1,13 @@
+{
+  "name": "test-vuln-mcp-server",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable MCP server for AgentAudit E2E testing",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
